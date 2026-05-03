@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* ===== THEME VARIABLES ===== */
         :root {
             --bg-primary: #050508;
             --bg-secondary: #0c0c12;
@@ -27,8 +28,27 @@
             --telegram: #0088cc;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ===== LIGHT MODE THEME ===== */
+        [data-theme="light"] {
+            --bg-primary: #f5f5f7;
+            --bg-secondary: #ebebef;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f0f0f5;
+            --bg-modal: #ffffff;
+            --accent: #e63946;
+            --accent-glow: #ff1a2e;
+            --accent-dark: #b91c28;
+            --gold: #c4900a;
+            --gold-dim: #a07000;
+            --text-primary: #111118;
+            --text-secondary: #55556a;
+            --text-muted: #9090a8;
+            --border: #dcdce8;
+            --border-accent: #c8c8da;
+            --telegram: #006fa8;
+        }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
 
         body {
@@ -36,16 +56,13 @@
             color: var(--text-primary);
             font-family: 'Noto Kufi Arabic', sans-serif;
             direction: rtl;
-            /* FIX: prevent horizontal overflow */
             overflow-x: hidden;
             min-height: 100vh;
             width: 100%;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* FIX: ensure all elements respect viewport width */
-        *, *::before, *::after {
-            max-width: 100%;
-        }
+        *, *::before, *::after { max-width: 100%; }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-primary); }
@@ -108,6 +125,13 @@
             background-clip: text;
         }
 
+        [data-theme="light"] .gold-gradient {
+            background: linear-gradient(135deg, #c4900a, #a07000, #c4900a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
         /* ===== LOADING SCREEN ===== */
         #loading-screen {
             position: fixed; inset: 0; z-index: 9999;
@@ -148,7 +172,6 @@
             animation: fadeIn 0.5s ease 0.7s both;
         }
 
-        /* FIX: loading screen font on small screens */
         @media (max-width: 480px) {
             #loading-screen .logo-text { font-size: 36px; letter-spacing: 2px; }
             #loading-screen .loading-bar-track { width: 140px; }
@@ -166,19 +189,19 @@
             border-bottom: 1px solid var(--border);
             box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         }
+        [data-theme="light"] #navbar.scrolled {
+            background: rgba(245,245,247,0.92);
+        }
         .nav-inner {
             max-width: 1280px; margin: 0 auto;
-            /* FIX: safe horizontal padding */
             padding: 0 16px;
             display: flex; align-items: center; justify-content: space-between;
             height: 72px;
-            /* FIX: prevent overflow */
             overflow: hidden;
         }
         .nav-logo {
             display: flex; align-items: center; gap: 12px; cursor: pointer;
             transition: transform 0.2s;
-            /* FIX: don't let logo push other items */
             flex-shrink: 0;
         }
         .nav-logo:hover { transform: scale(1.03); }
@@ -187,7 +210,6 @@
             border-radius: 12px; display: flex; align-items: center; justify-content: center;
             font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 18px;
             color: white; letter-spacing: 1px;
-            /* FIX: never shrink the icon */
             flex-shrink: 0;
         }
         .nav-logo-text h1 {
@@ -199,7 +221,6 @@
         }
         .nav-search {
             flex: 1; max-width: 420px; margin: 0 16px; position: relative;
-            /* FIX: min-width prevents collapse */
             min-width: 0;
         }
         .nav-search input {
@@ -218,6 +239,18 @@
             display: flex; align-items: center; gap: 8px;
             flex-shrink: 0;
         }
+
+        /* ===== THEME TOGGLE BUTTON ===== */
+        .theme-toggle-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 38px; height: 38px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; cursor: pointer; font-size: 16px;
+            transition: all 0.3s; color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+        .theme-toggle-btn:hover { border-color: rgba(230,57,70,0.4); background: var(--bg-card-hover); }
+
         .telegram-btn {
             display: inline-flex; align-items: center; gap: 8px;
             padding: 8px 16px; background: rgba(0,136,204,0.1);
@@ -234,7 +267,6 @@
             align-items: center; justify-content: center;
         }
 
-        /* FIX: mobile navbar breakpoints */
         @media (max-width: 768px) {
             .nav-search { display: none; }
             .telegram-btn span { display: none; }
@@ -252,6 +284,9 @@
             display: none; padding: 0 16px 12px;
             background: rgba(5,5,8,0.95);
         }
+        [data-theme="light"] #mobile-search-bar {
+            background: rgba(245,245,247,0.95);
+        }
         #mobile-search-bar.show { display: block; }
         #mobile-search-bar input {
             width: 100%; background: var(--bg-card); border: 1px solid var(--border);
@@ -268,22 +303,25 @@
             display: flex; align-items: center; overflow: hidden;
             padding-top: 80px;
         }
-        .hero-bg {
-            position: absolute; inset: 0;
-        }
+        .hero-bg { position: absolute; inset: 0; }
         .hero-bg .overlay-1 {
             position: absolute; inset: 0;
             background: linear-gradient(to top, var(--bg-primary), rgba(5,5,8,0.8), rgba(5,5,8,0.4));
         }
+        [data-theme="light"] .hero-bg .overlay-1 {
+            background: linear-gradient(to top, var(--bg-primary), rgba(245,245,247,0.85), rgba(245,245,247,0.5));
+        }
         .hero-bg .overlay-2 {
             position: absolute; inset: 0;
+            background: linear-gradient(to right, var(--bg-primary), transparent, var(--bg-primary));
+        }
+        [data-theme="light"] .hero-bg .overlay-2 {
             background: linear-gradient(to right, var(--bg-primary), transparent, var(--bg-primary));
         }
         .hero-orb-1 {
             position: absolute; top: 80px; right: 40px;
             width: 300px; height: 300px; background: rgba(230,57,70,0.05);
             border-radius: 50%; filter: blur(100px);
-            /* FIX: don't cause overflow */
             pointer-events: none;
         }
         .hero-orb-2 {
@@ -295,7 +333,6 @@
         .hero-content {
             position: relative; z-index: 10;
             max-width: 1280px; margin: 0 auto;
-            /* FIX: responsive padding */
             padding: 0 16px; width: 100%;
         }
         .hero-grid {
@@ -310,7 +347,6 @@
             animation: fadeInUp 0.8s ease 0.2s both;
         }
         .hero-title {
-            /* FIX: fluid font size with safe lower bound */
             font-size: clamp(28px, 6vw, 72px); font-weight: 900;
             line-height: 1.15; margin-bottom: 24px;
             animation: fadeInUp 0.8s ease 0.3s both;
@@ -348,13 +384,13 @@
             border-top: 1px solid rgba(30,30,46,0.5);
             animation: fadeInUp 0.8s ease 1s both;
         }
+        [data-theme="light"] .hero-stats {
+            border-top-color: var(--border);
+        }
         .hero-stat-value { font-size: 24px; font-weight: 900; }
         .hero-stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
-        /* Featured Card */
-        .hero-featured {
-            animation: slideInRight 0.8s ease 0.5s both;
-        }
+        .hero-featured { animation: slideInRight 0.8s ease 0.5s both; }
         .hero-featured-inner {
             position: relative; animation: float 6s ease-in-out infinite;
         }
@@ -369,9 +405,7 @@
             border-radius: 24px; overflow: hidden;
             box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
-        .hero-featured-card img {
-            width: 100%; height: 450px; object-fit: cover;
-        }
+        .hero-featured-card img { width: 100%; height: 450px; object-fit: cover; }
         .hero-featured-card .card-overlay {
             position: absolute; inset: 0;
             background: linear-gradient(to top, var(--bg-card), transparent, transparent);
@@ -386,13 +420,11 @@
         .hero-featured-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
         .hero-featured-sub { font-size: 13px; color: var(--text-muted); }
 
-        /* FIX: hero layout responsive breakpoints */
         @media (max-width: 1024px) {
             .hero-grid { grid-template-columns: 1fr; }
             .hero-featured { display: none !important; }
             #hero { min-height: 70vh; }
         }
-
         @media (max-width: 768px) {
             #hero { min-height: auto; padding-top: 80px; padding-bottom: 40px; }
             .hero-desc { font-size: 14px; }
@@ -400,7 +432,6 @@
             .hero-stat-value { font-size: 20px; }
             .hero-badge { font-size: 11px; padding: 5px 12px; }
         }
-
         @media (max-width: 480px) {
             #hero { padding-top: 70px; padding-bottom: 32px; }
             .hero-title { font-size: clamp(24px, 8vw, 40px); margin-bottom: 16px; }
@@ -412,6 +443,34 @@
             .hero-stat-label { font-size: 11px; }
             .hero-badge { margin-bottom: 16px; }
         }
+
+        /* ===== STUDIO FILTER BADGE ===== */
+        #studio-filter-bar {
+            display: none;
+            margin-bottom: 20px;
+        }
+        #studio-filter-bar.visible {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .studio-filter-label {
+            font-size: 13px; color: var(--text-secondary);
+        }
+        .studio-filter-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 14px; background: rgba(230,57,70,0.12);
+            border: 1px solid rgba(230,57,70,0.35); border-radius: 50px;
+            color: var(--accent); font-size: 13px; font-weight: 600;
+        }
+        .studio-filter-clear {
+            background: none; border: none; cursor: pointer;
+            color: var(--accent); font-size: 14px; font-weight: 700;
+            line-height: 1; padding: 0 2px;
+            transition: opacity 0.2s;
+        }
+        .studio-filter-clear:hover { opacity: 0.6; }
 
         /* ===== ANIME GRID ===== */
         #anime-section { padding: 40px 16px 64px; }
@@ -426,7 +485,6 @@
         }
         .section-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 
-        /* FIX: fully responsive grid with safe min column width */
         .anime-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -434,33 +492,20 @@
         }
 
         @media (max-width: 640px) {
-            .anime-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
+            .anime-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             #anime-section { padding: 32px 12px 48px; }
         }
-
         @media (max-width: 360px) {
-            .anime-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-            }
+            .anime-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
             #anime-section { padding: 24px 10px 40px; }
         }
 
-        /* Anime Card */
         .anime-card {
             cursor: pointer; transition: transform 0.3s ease;
-            /* FIX: ensure card doesn't overflow its grid cell */
             min-width: 0;
         }
         .anime-card:hover { transform: translateY(-6px); }
-
-        @media (hover: none) {
-            /* FIX: disable hover lift on touch devices */
-            .anime-card:hover { transform: none; }
-        }
+        @media (hover: none) { .anime-card:hover { transform: none; } }
 
         .anime-card-inner {
             background: var(--bg-card); border: 1px solid var(--border);
@@ -471,14 +516,15 @@
             border-color: rgba(230,57,70,0.4);
             box-shadow: 0 0 30px rgba(230,57,70,0.12), 0 8px 32px rgba(0,0,0,0.5);
         }
+        [data-theme="light"] .anime-card:hover .anime-card-inner {
+            box-shadow: 0 0 30px rgba(230,57,70,0.12), 0 8px 32px rgba(0,0,0,0.15);
+        }
         .anime-card-img {
             position: relative; aspect-ratio: 3/4; overflow: hidden;
         }
         .anime-card-img img {
             width: 100%; height: 100%; object-fit: cover;
-            transition: transform 0.6s ease;
-            /* FIX: prevent img from exceeding container */
-            display: block;
+            transition: transform 0.6s ease; display: block;
         }
         .anime-card:hover .anime-card-img img { transform: scale(1.08); }
         .anime-card-img .img-overlay {
@@ -505,6 +551,9 @@
             backdrop-filter: blur(8px); border: 1px solid rgba(255,215,0,0.3);
             border-radius: 8px; color: var(--gold); font-size: 11px; font-weight: 700;
             white-space: nowrap;
+        }
+        [data-theme="light"] .score-badge {
+            background: rgba(255,255,255,0.85);
         }
         .ep-badge {
             position: absolute; top: 8px; left: 8px;
@@ -534,13 +583,11 @@
             border-radius: 50px; color: var(--text-muted);
         }
 
-        /* FIX: hide genre tags on very small screens to save space */
         @media (max-width: 360px) {
             .anime-card-genres { display: none; }
             .anime-card-title { font-size: 11px; }
         }
 
-        /* Loading spinner for grid */
         .grid-loading {
             display: flex; flex-direction: column; align-items: center;
             justify-content: center; padding: 80px 16px;
@@ -553,11 +600,9 @@
             flex-shrink: 0;
         }
 
-        /* No results */
         .no-results {
             text-align: center; padding: 60px 16px;
             color: var(--text-muted); font-size: 16px;
-            /* FIX: break long search strings */
             word-break: break-word;
         }
 
@@ -565,30 +610,27 @@
         #anime-modal {
             position: fixed; inset: 0; z-index: 200;
             display: none; align-items: flex-start; justify-content: center;
-            /* FIX: vertical scroll only, no horizontal bleed */
             overflow-y: auto; overflow-x: hidden;
             background: rgba(0,0,0,0.95);
             backdrop-filter: blur(4px);
             animation: fadeIn 0.3s ease;
             -webkit-overflow-scrolling: touch;
-            /* FIX: padding keeps card away from screen edges on all sides */
             padding: 12px 8px 32px;
+        }
+        [data-theme="light"] #anime-modal {
+            background: rgba(0,0,0,0.75);
         }
         #anime-modal.open { display: flex; }
 
         .modal-card {
             position: relative;
-            /* FIX: never wider than viewport minus the modal's own padding */
             width: 100%; max-width: 1100px;
-            /* FIX: margin removed — padding on the overlay handles spacing */
             margin: 0 auto;
             background: var(--bg-modal); border: 1px solid var(--border);
             border-radius: 20px;
-            /* FIX: clip inner content so nothing escapes the rounded card */
             overflow: hidden;
             box-shadow: 0 25px 50px rgba(0,0,0,0.8);
             animation: fadeInUp 0.4s ease;
-            /* FIX: allow the card to shrink in flex context */
             min-width: 0; flex-shrink: 0;
         }
 
@@ -603,60 +645,35 @@
             backdrop-filter: blur(8px); border: 1px solid var(--border);
             border-radius: 12px; cursor: pointer; transition: all 0.3s;
             color: var(--text-secondary); font-size: 16px; line-height: 1;
-            /* FIX: fixed tap-target size, centered icon */
             width: 36px; height: 36px;
             display: flex; align-items: center; justify-content: center;
         }
+        [data-theme="light"] .modal-close { background: rgba(245,245,247,0.9); }
         .modal-close:hover { background: var(--accent); border-color: var(--accent); color: white; }
 
-        /* Player */
         .modal-player { display: none; width: 100%; background: #000; }
         .modal-player.active { display: block; }
-        .modal-player-wrap {
-            position: relative; width: 100%; padding-bottom: 56.25%;
-        }
-        .modal-player-wrap iframe {
-            position: absolute; inset: 0; width: 100%; height: 100%; border: none;
-        }
+        .modal-player-wrap { position: relative; width: 100%; padding-bottom: 56.25%; }
+        .modal-player-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
 
-        /* FIX: stepped padding — comfortable on large screens, tight but usable on small */
         .modal-body { padding: 14px; }
         @media (min-width: 480px) { .modal-body { padding: 18px; } }
         @media (min-width: 640px) { .modal-body { padding: 24px; } }
         @media (min-width: 768px) { .modal-body { padding: 32px; } }
 
-        /* FIX: mobile = column, desktop = row */
-        .modal-layout {
-            display: flex; flex-direction: column; gap: 16px;
-        }
-        @media (min-width: 768px) {
-            .modal-layout { flex-direction: row; gap: 28px; }
-        }
+        .modal-layout { display: flex; flex-direction: column; gap: 16px; }
+        @media (min-width: 768px) { .modal-layout { flex-direction: row; gap: 28px; } }
 
-        /* ── Poster column ── */
         .modal-poster { flex-shrink: 0; width: 100%; min-width: 0; }
         @media (min-width: 768px)  { .modal-poster { width: 220px; } }
         @media (min-width: 1024px) { .modal-poster { width: 248px; } }
 
-        /* FIX: on mobile show poster + sidebar side-by-side to save vertical space */
         @media (max-width: 767px) {
             .modal-layout { flex-direction: column; }
-            .modal-poster-mobile-row {
-                display: flex; gap: 14px; align-items: flex-start;
-            }
-            .modal-poster-img {
-                flex-shrink: 0;
-                /* FIX: compact fixed width on mobile — not full-width */
-                width: 110px !important;
-            }
-            .modal-poster-img img {
-                /* FIX: taller crop so face shows, but nowhere near full-screen */
-                height: 150px !important; max-height: 150px !important;
-            }
-            .modal-poster-sidebar {
-                flex: 1; min-width: 0;
-                display: flex; flex-direction: column; gap: 10px;
-            }
+            .modal-poster-mobile-row { display: flex; gap: 14px; align-items: flex-start; }
+            .modal-poster-img { flex-shrink: 0; width: 110px !important; }
+            .modal-poster-img img { height: 150px !important; max-height: 150px !important; }
+            .modal-poster-sidebar { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
         }
 
         .modal-poster-img {
@@ -665,70 +682,66 @@
         }
         .modal-poster-img img {
             width: 100%; object-fit: cover; display: block;
-            /* FIX: default cap for screens between 480–767px */
             max-height: 200px;
         }
         @media (min-width: 768px) {
             .modal-poster-img img { max-height: none; height: 320px; }
         }
 
-        /* Season selector */
-        .season-select-wrap { margin-top: 12px; }
-        .season-select-wrap label {
-            display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px;
+        /* ===== SEASON SWITCHER PILLS ===== */
+        .season-pills-wrap { margin-top: 12px; }
+        .season-pills-wrap label {
+            display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 7px;
         }
-        .season-select-wrap select {
-            width: 100%; appearance: none; background: var(--bg-card);
-            border: 1px solid var(--border); border-radius: 12px;
-            padding: 9px 14px; color: var(--text-primary);
-            font-family: inherit; font-size: 13px; cursor: pointer; outline: none;
-            transition: border-color 0.3s;
+        .season-pills {
+            display: flex; flex-wrap: wrap; gap: 6px;
         }
-        .season-select-wrap select:focus { border-color: rgba(230,57,70,0.5); }
+        .season-pill {
+            padding: 6px 13px; border-radius: 50px;
+            font-size: 12px; font-weight: 600; font-family: inherit;
+            cursor: pointer; transition: all 0.25s;
+            background: var(--bg-secondary); border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .season-pill:hover { border-color: rgba(230,57,70,0.4); color: var(--accent); }
+        .season-pill.active {
+            background: var(--accent); color: white; border-color: var(--accent);
+            box-shadow: 0 3px 12px rgba(230,57,70,0.3);
+        }
 
-        /* Sidebar info */
         .sidebar-info {
             margin-top: 12px; background: var(--bg-card);
             border: 1px solid var(--border); border-radius: 14px; padding: 12px;
-            /* FIX: never let the box exceed its column */
             overflow: hidden;
         }
         .sidebar-info-row {
             display: flex; align-items: baseline; gap: 6px;
             padding: 4px 0; font-size: 12px; min-width: 0;
-            /* FIX: wrap instead of overflow */
             flex-wrap: wrap;
         }
-        .sidebar-info-row .info-icon {
-            color: var(--accent); font-size: 13px; flex-shrink: 0;
-            /* keep icon on same line as label */
-            align-self: center;
-        }
+        .sidebar-info-row .info-icon { color: var(--accent); font-size: 13px; flex-shrink: 0; align-self: center; }
         .sidebar-info-row .info-icon.gold { color: var(--gold); }
-        .sidebar-info-row .info-label {
-            color: var(--text-secondary); flex-shrink: 0; font-size: 11px;
-        }
-        .sidebar-info-row .info-value {
-            color: var(--text-primary); font-size: 12px;
-            /* FIX: break long studio/season names instead of hiding them */
-            word-break: break-word; overflow-wrap: anywhere;
-            min-width: 0;
-        }
+        .sidebar-info-row .info-label { color: var(--text-secondary); flex-shrink: 0; font-size: 11px; }
+        .sidebar-info-row .info-value { color: var(--text-primary); font-size: 12px; word-break: break-word; overflow-wrap: anywhere; min-width: 0; }
         .sidebar-info-row .info-value.accent { color: var(--accent); font-weight: 500; }
         .sidebar-info-row .info-value.gold-text { font-weight: 700; }
 
-        /* ── Main content column ── */
+        /* Studio link */
+        .studio-link {
+            color: var(--accent); font-weight: 600; font-size: 12px;
+            cursor: pointer; text-decoration: none;
+            border-bottom: 1px dashed rgba(230,57,70,0.4);
+            transition: border-color 0.2s, opacity 0.2s;
+        }
+        .studio-link:hover { border-color: var(--accent); opacity: 0.8; }
+
         .modal-main { flex: 1; min-width: 0; }
         .modal-anime-title {
             font-size: clamp(18px, 4vw, 26px); font-weight: 900; margin-bottom: 4px;
             word-break: break-word;
         }
-        .modal-anime-sub {
-            color: var(--text-muted); font-size: 12px; margin-bottom: 16px;
-            word-break: break-word;
-        }
+        .modal-anime-sub { color: var(--text-muted); font-size: 12px; margin-bottom: 16px; word-break: break-word; }
 
-        /* Tabs — horizontally scrollable on mobile */
         .modal-tabs {
             display: flex; gap: 4px; margin-bottom: 18px;
             background: var(--bg-card); border: 1px solid var(--border);
@@ -740,7 +753,6 @@
         .modal-tab-btn {
             display: flex; align-items: center; gap: 5px;
             padding: 8px 11px; border-radius: 10px;
-            /* FIX: slightly smaller font so all 4 tabs fit on mid-size phones */
             font-size: 11px; font-weight: 500; white-space: nowrap;
             background: none; border: none; cursor: pointer;
             color: var(--text-muted); font-family: inherit;
@@ -754,7 +766,6 @@
             color: var(--text-secondary); background: var(--bg-secondary);
         }
 
-        /* Tab panels */
         .tab-panel { display: none; animation: fadeIn 0.3s ease; }
         .tab-panel.active { display: block; }
 
@@ -762,17 +773,13 @@
         .story-text { color: var(--text-secondary); line-height: 1.8; font-size: 13px; }
         .episodes-heading { font-size: 15px; font-weight: 700; margin-top: 24px; margin-bottom: 12px; }
 
-        /* Episodes grid */
         .episodes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
             gap: 7px;
         }
         @media (max-width: 400px) {
-            .episodes-grid {
-                grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
-                gap: 5px;
-            }
+            .episodes-grid { grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 5px; }
         }
 
         .episode-btn {
@@ -789,7 +796,6 @@
             box-shadow: 0 4px 16px rgba(230,57,70,0.3); transform: scale(1.04);
         }
 
-        /* Characters / Staff grid */
         .people-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
         @media (min-width: 480px) { .people-grid { grid-template-columns: 1fr 1fr; } }
 
@@ -800,67 +806,38 @@
             transition: border-color 0.3s; min-width: 0; overflow: hidden;
         }
         .person-card:hover { border-color: rgba(230,57,70,0.3); }
-        .person-card img {
-            width: 42px; height: 56px; border-radius: 8px;
-            object-fit: cover; flex-shrink: 0;
-        }
+        .person-card img { width: 42px; height: 56px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
         .person-card .person-info { min-width: 0; flex: 1; }
-        .person-card .person-name {
-            font-weight: 700; font-size: 12px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .person-card .person-sub {
-            font-size: 10px; color: var(--text-muted); margin-top: 2px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .person-card .person-role {
-            display: inline-block; font-size: 10px; padding: 2px 8px;
-            border-radius: 50px; margin-top: 4px;
-        }
+        .person-card .person-name { font-weight: 700; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .person-card .person-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .person-card .person-role { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 50px; margin-top: 4px; }
         .person-card .role-main  { background: rgba(230,57,70,0.1); color: var(--accent); }
         .person-card .role-support { background: var(--bg-secondary); color: var(--text-muted); }
 
-        /* Trailer */
         .trailer-wrap {
             position: relative; border-radius: 14px; overflow: hidden;
             border: 1px solid var(--border); width: 100%; padding-bottom: 56.25%;
         }
-        .trailer-wrap iframe {
-            position: absolute; inset: 0; width: 100%; height: 100%; border: none;
-        }
-        .no-trailer {
-            text-align: center; padding: 48px 16px;
-            background: var(--bg-card); border-radius: 14px;
-            border: 1px solid var(--border);
-        }
+        .trailer-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+        .no-trailer { text-align: center; padding: 48px 16px; background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); }
         .no-trailer p { color: var(--text-muted); font-size: 16px; margin-top: 12px; }
 
-        /* Skeleton loaders */
-        .skeleton {
-            height: 16px; background: var(--bg-card); border-radius: 8px;
-            margin-bottom: 8px;
-        }
+        .skeleton { height: 16px; background: var(--bg-card); border-radius: 8px; margin-bottom: 8px; }
 
         /* ===== FOOTER ===== */
         #footer {
             margin-top: 48px; border-top: 1px solid var(--border);
             background: rgba(12,12,18,0.5); position: relative;
         }
+        [data-theme="light"] #footer { background: rgba(235,235,239,0.5); }
         .footer-accent-line {
             position: absolute; top: 0; left: 50%; transform: translateX(-50%);
             width: 128px; height: 2px;
             background: linear-gradient(90deg, transparent, var(--accent), transparent);
         }
-        .footer-inner {
-            max-width: 1280px; margin: 0 auto; padding: 40px 16px;
-        }
-        .footer-grid {
-            display: grid; grid-template-columns: 1fr; gap: 28px;
-            align-items: center;
-        }
-        @media (min-width: 768px) {
-            .footer-grid { grid-template-columns: 1fr 1fr 1fr; }
-        }
+        .footer-inner { max-width: 1280px; margin: 0 auto; padding: 40px 16px; }
+        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 28px; align-items: center; }
+        @media (min-width: 768px) { .footer-grid { grid-template-columns: 1fr 1fr 1fr; } }
         .footer-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
         .footer-brand-icon {
             width: 38px; height: 38px; background: var(--accent);
@@ -868,9 +845,7 @@
             font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 15px; color: white;
             flex-shrink: 0;
         }
-        .footer-brand h3 {
-            font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700;
-        }
+        .footer-brand h3 { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; }
         .footer-desc { color: var(--text-muted); font-size: 13px; line-height: 1.7; }
         .footer-center { text-align: center; }
         .footer-telegram {
@@ -882,9 +857,7 @@
         }
         .footer-telegram:hover { background: rgba(0,136,204,0.2); transform: scale(1.03); }
         .footer-end { display: flex; justify-content: flex-end; }
-        @media (max-width: 767px) {
-            .footer-end { justify-content: center; }
-        }
+        @media (max-width: 767px) { .footer-end { justify-content: center; } }
         .back-to-top {
             display: flex; align-items: center; gap: 8px;
             padding: 8px 16px; background: var(--bg-card);
@@ -899,6 +872,7 @@
             display: flex; flex-wrap: wrap; align-items: center;
             justify-content: space-between; gap: 12px;
         }
+        [data-theme="light"] .footer-bottom { border-top-color: var(--border); }
         .footer-copy { color: var(--text-muted); font-size: 12px; }
         .footer-love { color: var(--text-muted); font-size: 12px; }
         .footer-love .heart { color: var(--accent); }
@@ -938,6 +912,8 @@
         </div>
 
         <div class="nav-actions">
+            <!-- Theme toggle button -->
+            <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="تبديل الوضع"></button>
             <button class="mobile-search-btn" onclick="toggleMobileSearch()">🔍</button>
             <a href="https://t.me/OtakuZoen" target="_blank" rel="noopener noreferrer" class="telegram-btn">
                 ✈️ <span>تيليجرام</span>
@@ -1022,6 +998,15 @@
             </div>
         </div>
 
+        <!-- Studio filter badge -->
+        <div id="studio-filter-bar">
+            <span class="studio-filter-label">تصفية حسب الاستوديو:</span>
+            <div class="studio-filter-badge">
+                <span id="studio-filter-name"></span>
+                <button class="studio-filter-clear" onclick="clearStudioFilter()" title="إزالة التصفية">✕</button>
+            </div>
+        </div>
+
         <div id="anime-grid-container">
             <div class="grid-loading">
                 <div class="spinner"></div>
@@ -1047,15 +1032,15 @@
             <div class="modal-layout">
                 <!-- Poster Side -->
                 <div class="modal-poster">
-                    <!-- On mobile: poster + sidebar sit side-by-side to save vertical space -->
                     <div class="modal-poster-mobile-row">
                         <div class="modal-poster-img">
                             <img id="modal-poster" src="" alt="">
                         </div>
                         <div class="modal-poster-sidebar">
-                            <div class="season-select-wrap" id="season-select-wrap" style="display:none;">
+                            <!-- Season pills (replaces dropdown) -->
+                            <div class="season-pills-wrap" id="season-pills-wrap" style="display:none;">
                                 <label>اختر الموسم:</label>
-                                <select id="season-select" onchange="updateEpisodes(this.value)"></select>
+                                <div class="season-pills" id="season-pills"></div>
                             </div>
                             <div class="sidebar-info" id="sidebar-info"></div>
                         </div>
@@ -1128,6 +1113,54 @@ let currentSeasonsMap = {};
 let currentSeasonKeys = [];
 let activeEpisodeNum = null;
 let searchQuery = '';
+let studioFilter = ''; // NEW: active studio filter
+
+// ===========================
+// ===== FEATURE 3: AUTO DAY/NIGHT MODE =====
+// ===========================
+
+let userThemeOverride = null; // null = auto, 'dark' or 'light' = manual
+
+function getSystemTheme() {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    userThemeOverride = current === 'dark' ? 'light' : 'dark';
+    applyTheme(userThemeOverride);
+    try { localStorage.setItem('oz-theme', userThemeOverride); } catch(e) {}
+}
+
+function initTheme() {
+    // Try to restore manual override from localStorage
+    let saved = null;
+    try { saved = localStorage.getItem('oz-theme'); } catch(e) {}
+
+    if (saved === 'light' || saved === 'dark') {
+        userThemeOverride = saved;
+        applyTheme(userThemeOverride);
+    } else {
+        // Auto mode: follow system
+        applyTheme(getSystemTheme());
+    }
+
+    // Watch for system theme changes (runtime)
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!userThemeOverride) {
+            applyTheme(e.matches ? 'dark' : 'light');
+        }
+    });
+}
+
+// Run theme init immediately (before page paint)
+initTheme();
 
 // ===== UTILITIES =====
 async function translateAr(text) {
@@ -1151,9 +1184,7 @@ window.addEventListener('scroll', () => {
 function toggleMobileSearch() {
     const bar = document.getElementById('mobile-search-bar');
     bar.classList.toggle('show');
-    if (bar.classList.contains('show')) {
-        bar.querySelector('input').focus();
-    }
+    if (bar.classList.contains('show')) bar.querySelector('input').focus();
 }
 
 // ===== SEARCH / FILTER =====
@@ -1164,6 +1195,25 @@ function filterAnime(q) {
     renderGrid();
 }
 
+// ===========================
+// ===== FEATURE 1: STUDIO FILTER =====
+// ===========================
+
+function filterByStudio(studioName) {
+    studioFilter = studioName;
+    closeModal();
+    document.getElementById('studio-filter-name').textContent = studioName;
+    document.getElementById('studio-filter-bar').classList.add('visible');
+    renderGrid();
+    document.getElementById('anime-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function clearStudioFilter() {
+    studioFilter = '';
+    document.getElementById('studio-filter-bar').classList.remove('visible');
+    renderGrid();
+}
+
 // ===== RENDER ANIME GRID =====
 function renderGrid() {
     const container = document.getElementById('anime-grid-container');
@@ -1171,19 +1221,31 @@ function renderGrid() {
 
     if (entries.length === 0) return;
 
-    const filtered = entries.filter(d => {
-        if (!searchQuery) return true;
-        return (
+    let filtered = entries;
+
+    // Apply studio filter
+    if (studioFilter) {
+        filtered = filtered.filter(d =>
+            (d.anime.studios || []).some(s => s.name === studioFilter)
+        );
+    }
+
+    // Apply search query
+    if (searchQuery) {
+        filtered = filtered.filter(d =>
             d.anime.title.toLowerCase().includes(searchQuery) ||
             (d.anime.title_japanese || '').includes(searchQuery)
         );
-    });
+    }
 
     document.getElementById('anime-count').textContent = `${filtered.length} أنمي متاح للمشاهدة`;
     document.getElementById('stat-count').textContent = `${entries.length}+`;
 
     if (filtered.length === 0) {
-        container.innerHTML = `<div class="no-results">لا توجد نتائج للبحث "${searchQuery}"</div>`;
+        const msg = studioFilter
+            ? `لا توجد أنميات من استوديو "${studioFilter}"`
+            : `لا توجد نتائج للبحث "${searchQuery}"`;
+        container.innerHTML = `<div class="no-results">${msg}</div>`;
         return;
     }
 
@@ -1255,6 +1317,7 @@ async function openModal(malId) {
     document.getElementById('modal-title').textContent = a.title;
     document.getElementById('modal-sub').textContent = a.title_japanese || '';
 
+    // Build seasons map
     currentSeasonsMap = {};
     currentModalEpisodes.forEach(e => {
         if (!currentSeasonsMap[e.season_number]) currentSeasonsMap[e.season_number] = [];
@@ -1262,15 +1325,23 @@ async function openModal(malId) {
     });
     currentSeasonKeys = Object.keys(currentSeasonsMap).map(Number).sort((a, b) => a - b);
 
-    const selectWrap = document.getElementById('season-select-wrap');
-    const select = document.getElementById('season-select');
+    // ===========================
+    // FEATURE 2: SEASON PILLS
+    // ===========================
+    const pillsWrap = document.getElementById('season-pills-wrap');
+    const pillsContainer = document.getElementById('season-pills');
+
     if (currentSeasonKeys.length > 1) {
-        selectWrap.style.display = '';
-        select.innerHTML = currentSeasonKeys.map(s => `<option value="${s}">الموسم ${s}</option>`).join('');
+        pillsWrap.style.display = '';
+        pillsContainer.innerHTML = currentSeasonKeys.map(s =>
+            `<button class="season-pill${s === currentSeasonKeys[0] ? ' active' : ''}"
+                     onclick="selectSeasonPill(this, ${s})">الموسم ${s}</button>`
+        ).join('');
     } else {
-        selectWrap.style.display = 'none';
+        pillsWrap.style.display = 'none';
     }
 
+    // Sidebar skeleton
     document.getElementById('sidebar-info').innerHTML = `
         <div class="sidebar-info-row"><span class="info-icon gold">⭐</span><span class="info-label">تقييم MAL:</span><span class="info-value gold-text gold-gradient">${a.score || 'N/A'}</span></div>
         <div class="sidebar-info-row"><span class="info-icon">⏳</span><span class="info-label">الحالة:</span><span class="info-value">...</span></div>
@@ -1311,12 +1382,18 @@ async function openModal(malId) {
             translateAr(a.rating)
         ]);
 
+        const studioName = a.studios?.[0]?.name || null;
+        // Build studio cell — clickable if studio is known
+        const studioCell = studioName
+            ? `<a class="studio-link" onclick="filterByStudio('${studioName.replace(/'/g, "\\'")}')">${studioName}</a>`
+            : 'غير معروف';
+
         document.getElementById('sidebar-info').innerHTML = `
             <div class="sidebar-info-row"><span class="info-icon gold">⭐</span><span class="info-label">تقييم MAL:</span><span class="info-value gold-text gold-gradient">${a.score || 'N/A'}</span></div>
             <div class="sidebar-info-row"><span class="info-icon">⏳</span><span class="info-label">الحالة:</span><span class="info-value">${arStatus}</span></div>
             <div class="sidebar-info-row"><span class="info-icon">📺</span><span class="info-label">النوع:</span><span class="info-value">${a.type || ''}</span></div>
             <div class="sidebar-info-row"><span class="info-icon">📅</span><span class="info-label">الموسم:</span><span class="info-value">${a.season || ''} ${a.year || ''}</span></div>
-            <div class="sidebar-info-row"><span class="info-icon">🎬</span><span class="info-label">الاستوديو:</span><span class="info-value accent">${a.studios?.[0]?.name || 'غير معروف'}</span></div>
+            <div class="sidebar-info-row"><span class="info-icon">🎬</span><span class="info-label">الاستوديو:</span><span class="info-value">${studioCell}</span></div>
             <div class="sidebar-info-row"><span class="info-icon">⚠️</span><span class="info-label">الفئة:</span><span class="info-value">${arRating}</span></div>
         `;
 
@@ -1326,7 +1403,7 @@ async function openModal(malId) {
             <h3 class="episodes-heading">حلقات المشاهدة:</h3>
             <div id="episodes-display"></div>
         `;
-        updateEpisodes(document.getElementById('season-select').value || currentSeasonKeys[0]);
+        updateEpisodes(currentSeasonKeys[0]);
 
         const chars = (charRes.data || []).slice(0, 12);
         document.getElementById('tab-chars').innerHTML = `<div class="people-grid">${chars.map((c, i) => `
@@ -1354,6 +1431,16 @@ async function openModal(malId) {
     } catch (err) {
         console.error('Error loading modal details:', err);
     }
+}
+
+// ===========================
+// FEATURE 2: Season pill handler
+// ===========================
+function selectSeasonPill(btn, seasonNum) {
+    // Update active state on pills
+    document.querySelectorAll('#season-pills .season-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    updateEpisodes(seasonNum);
 }
 
 function updateEpisodes(seasonNum) {
@@ -1442,9 +1529,7 @@ async function init() {
                 console.error(`Error fetching anime ${malIds[i]}:`, err);
             }
 
-            if (i < malIds.length - 1) {
-                await delay(400);
-            }
+            if (i < malIds.length - 1) await delay(400);
         }
 
         renderGrid();
