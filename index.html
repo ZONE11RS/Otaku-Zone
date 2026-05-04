@@ -28,7 +28,6 @@
             --telegram: #0088cc;
         }
 
-        /* ===== LIGHT MODE THEME ===== */
         [data-theme="light"] {
             --bg-primary: #f5f5f7;
             --bg-secondary: #ebebef;
@@ -36,314 +35,236 @@
             --bg-card-hover: #f0f0f5;
             --bg-modal: #ffffff;
             --accent: #e63946;
-            --accent-glow: #ff1a2e;
-            --accent-dark: #b91c28;
-            --gold: #c4900a;
-            --gold-dim: #a07000;
             --text-primary: #111118;
             --text-secondary: #55556a;
             --text-muted: #9090a8;
             --border: #dcdce8;
-            --border-accent: #c8c8da;
-            --telegram: #006fa8;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-
         body {
             background-color: var(--bg-primary);
             color: var(--text-primary);
             font-family: 'Noto Kufi Arabic', sans-serif;
             direction: rtl;
-            overflow-x: hidden;
-            min-height: 100vh;
-            width: 100%;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.3s ease;
         }
 
-        *, *::before, *::after { max-width: 100%; }
+        /* Navbar & Hero Styles (مختصرة للحفاظ على الحجم) */
+        #navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; transition: 0.4s; padding: 10px 16px; background: rgba(5,5,8,0.8); backdrop-filter: blur(10px); }
+        .nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+        .nav-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .nav-logo-icon { width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; }
+        
+        #hero { padding: 120px 20px 60px; text-align: center; background: radial-gradient(circle at top, #1a0d0e, var(--bg-primary)); }
+        .hero-title { font-size: 3rem; font-weight: 900; margin-bottom: 20px; }
+        .text-gradient { background: linear-gradient(135deg, var(--accent), #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-primary); }
-        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+        /* Anime Grid */
+        #anime-section { padding: 40px 20px; max-width: 1280px; margin: 0 auto; }
+        .anime-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+        .anime-card { background: var(--bg-card); border-radius: 15px; overflow: hidden; cursor: pointer; transition: 0.3s; border: 1px solid var(--border); }
+        .anime-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+        .anime-card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; }
+        .anime-card-info { padding: 10px; }
+        .anime-card-title { font-size: 13px; font-weight: 700; height: 38px; overflow: hidden; }
 
-        /* ===== ANIMATIONS ===== */
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(40px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(230, 57, 70, 0.1); }
-            50% { box-shadow: 0 0 40px rgba(230, 57, 70, 0.25); }
-        }
-        @keyframes loadingBar {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-        @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.5); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* Modal & Player */
+        #anime-modal { position: fixed; inset: 0; z-index: 200; display: none; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); overflow-y: auto; padding: 20px 10px; }
+        #anime-modal.open { display: block; }
+        .modal-card { max-width: 1000px; margin: 0 auto; background: var(--bg-modal); border-radius: 20px; overflow: hidden; position: relative; border: 1px solid var(--border); }
+        .modal-close { position: absolute; top: 15px; left: 15px; background: var(--accent); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; z-index: 10; }
+        
+        .player-container { width: 100%; background: #000; display: none; }
+        .player-container.active { display: block; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
+        /* Quick Nav Buttons (ميزة التنقل الجديدة) */
+        #quick-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: var(--bg-secondary); border-bottom: 1px solid var(--border); }
+        .nav-btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-family: inherit; font-weight: 600; transition: 0.2s; }
+        .nav-btn-next { background: var(--accent); color: white; }
+        .nav-btn-prev { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border); }
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .modal-body { padding: 25px; }
+        .episodes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px; margin-top: 20px; }
+        .episode-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary); padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 700; }
+        .episode-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+        #loading-screen { position: fixed; inset: 0; background: var(--bg-primary); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .spinner { width: 50px; height: 50px; border: 5px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div id="loading-screen">
+    <div class="spinner"></div>
+    <p style="margin-top: 20px;">جاري تجهيز عالمك الخاص...</p>
+</div>
+
+<nav id="navbar">
+    <div class="nav-inner">
+        <div class="nav-logo">
+            <div class="nav-logo-icon">OZ</div>
+            <h1 style="font-size: 1.2rem;"><span class="text-gradient">OTAKU</span> ZONE</h1>
+        </div>
+        <div class="nav-actions">
+            <a href="https://t.me/OtakuZoen" class="nav-btn-next nav-btn" style="text-decoration: none;">تيليجرام</a>
+        </div>
+    </div>
+</nav>
+
+<section id="hero">
+    <h1 class="hero-title">عالم <span class="text-gradient">الأنمي</span> بين يديك</h1>
+    <p style="color: var(--text-secondary);">شاهد أحدث الحلقات المترجمة بجودة عالية وتجربة مشاهدة فريدة.</p>
+</section>
+
+<section id="anime-section">
+    <h2 style="margin-bottom: 20px;">🎬 قائمة الأنمي المتاحة</h2>
+    <div id="anime-grid" class="anime-grid"></div>
+</section>
+
+<div id="anime-modal">
+    <div class="modal-card">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        
+        <div id="modal-player" class="player-container">
+            <div class="video-wrapper">
+                <iframe id="main-iframe" src="" allowfullscreen></iframe>
+            </div>
+            <div id="quick-nav">
+                <button id="prev-ep-btn" class="nav-btn nav-btn-prev">◄ الحلقة السابقة</button>
+                <span id="current-ep-label" style="font-weight: 800; color: var(--accent);"></span>
+                <button id="next-ep-btn" class="nav-btn nav-btn-next">الحلقة التالية ►</button>
+            </div>
+        </div>
+
+        <div class="modal-body">
+            <h1 id="modal-title" class="text-gradient"></h1>
+            <p id="modal-desc" style="margin: 15px 0; color: var(--text-secondary); font-size: 14px; line-height: 1.7;"></p>
+            <h3>الحلقات</h3>
+            <div id="episodes-list" class="episodes-grid"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SB_URL = "https://bdzbajkpaqkujbkvrjfu.supabase.co";
+    const SB_KEY = "sb_publishable_gwkBiDaTv8jYG4IHFITCLA__zBnhS8r";
+    const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
+    let allData = {};
+    let currentEpisodes = [];
+
+    async function init() {
+        try {
+            // جلب البيانات من Supabase
+            const { data: episodes, error } = await _supabase.from('episodes').select('*');
+            if (error) throw error;
+
+            const groups = {};
+            episodes.forEach(e => {
+                if (!groups[e.mal_id]) groups[e.mal_id] = [];
+                groups[e.mal_id].push(e);
+            });
+
+            const animeGrid = document.getElementById('anime-grid');
+            const malIds = Object.keys(groups);
+
+            for (const id of malIds) {
+                const res = await fetch(`https://api.jikan.moe/v4/anime/${id}`);
+                const { data: anime } = await res.json();
+                
+                allData[id] = { anime, episodes: groups[id].sort((a,b) => a.episode_number - b.episode_number) };
+
+                const card = document.createElement('div');
+                card.className = 'anime-card';
+                card.onclick = () => openModal(id);
+                card.innerHTML = `
+                    <img src="${anime.images.jpg.image_url}" alt="${anime.title}">
+                    <div class="anime-card-info">
+                        <div class="anime-card-title">${anime.title}</div>
+                    </div>
+                `;
+                animeGrid.appendChild(card);
+            }
+            document.getElementById('loading-screen').style.display = 'none';
+        } catch (e) { console.error(e); }
+    }
+
+    function openModal(id) {
+        const data = allData[id];
+        currentEpisodes = data.episodes;
+        
+        document.getElementById('modal-title').textContent = data.anime.title;
+        document.getElementById('modal-desc').textContent = data.anime.synopsis;
+        
+        const epList = document.getElementById('episodes-list');
+        epList.innerHTML = '';
+        
+        currentEpisodes.forEach((ep, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'episode-btn';
+            btn.id = `ep-btn-${ep.episode_number}`;
+            btn.textContent = ep.episode_number;
+            btn.onclick = () => playEpisode(index);
+            epList.appendChild(btn);
+        });
+
+        document.getElementById('anime-modal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function playEpisode(index) {
+        const ep = currentEpisodes[index];
+        const iframe = document.getElementById('main-iframe');
+        const player = document.getElementById('modal-player');
+        
+        player.classList.add('active');
+        iframe.src = ep.video_url;
+
+        // تحديث أزرار القائمة
+        document.querySelectorAll('.episode-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`ep-btn-${ep.episode_number}`).classList.add('active');
+
+        // تحديث شريط التنقل (التالي والسابق)
+        const prevBtn = document.getElementById('prev-ep-btn');
+        const nextBtn = document.getElementById('next-ep-btn');
+        const label = document.getElementById('current-ep-label');
+
+        label.textContent = `الحلقة ${ep.episode_number}`;
+
+        // إعداد زر "السابق"
+        if (index > 0) {
+            prevBtn.disabled = false;
+            prevBtn.onclick = () => playEpisode(index - 1);
+        } else {
+            prevBtn.disabled = true;
         }
 
-        /* ===== NOTICE BANNER ANIMATION ===== */
-        @keyframes slideDown {
-            from { transform: translateY(-110%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes slideUp {
-            from { transform: translateY(0); opacity: 1; max-height: 200px; }
-            to { transform: translateY(-110%); opacity: 0; max-height: 0; }
+        // إعداد زر "التالي"
+        if (index < currentEpisodes.length - 1) {
+            nextBtn.disabled = false;
+            nextBtn.onclick = () => playEpisode(index + 1);
+        } else {
+            nextBtn.disabled = true;
         }
 
-        /* ===== APOLOGY NOTICE BANNER ===== */
-        #apology-notice {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
-            transform: translateY(-110%); opacity: 0; will-change: transform, opacity;
-        }
-        #apology-notice.slide-in { animation: slideDown 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        #apology-notice.slide-out { animation: slideUp 0.4s ease-in forwards; }
+        document.getElementById('anime-modal').scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-        .notice-inner {
-            background: linear-gradient(135deg, #1a0d0e 0%, #120a0b 50%, #1a0d0e 100%);
-            border-bottom: 1px solid rgba(230, 57, 70, 0.35);
-            padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.6), 0 1px 0 rgba(230,57,70,0.2) inset;
-            position: relative; overflow: hidden;
-        }
-        .notice-inner::before {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(90deg, transparent 0%, rgba(230,57,70,0.04) 50%, transparent 100%);
-            background-size: 200% 100%; animation: shimmer 3s infinite; pointer-events: none;
-        }
-        .notice-inner::after {
-            content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 3px;
-            background: linear-gradient(to bottom, transparent, var(--accent), transparent);
-        }
-        [data-theme="light"] .notice-inner {
-            background: linear-gradient(135deg, #fff0f1 0%, #fff5f5 50%, #fff0f1 100%);
-            border-bottom-color: rgba(230,57,70,0.25);
-            box-shadow: 0 4px 24px rgba(0,0,0,0.12), 0 1px 0 rgba(230,57,70,0.15) inset;
-        }
-        .notice-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; filter: drop-shadow(0 0 6px rgba(230,57,70,0.5)); }
-        .notice-content { flex: 1; min-width: 0; }
-        .notice-title { font-size: 13px; font-weight: 800; color: var(--accent); margin-bottom: 4px; letter-spacing: 0.3px; text-shadow: 0 0 20px rgba(230,57,70,0.3); }
-        .notice-text { font-size: 12px; color: var(--text-secondary); line-height: 1.75; }
-        [data-theme="light"] .notice-text { color: #55556a; }
-        .notice-close {
-            flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px;
-            background: rgba(230,57,70,0.1); border: 1px solid rgba(230,57,70,0.2);
-            color: var(--text-muted); font-size: 14px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.25s ease; font-family: inherit; line-height: 1; margin-top: 1px;
-        }
-        .notice-close:hover { background: var(--accent); border-color: var(--accent); color: white; transform: scale(1.1); }
-        @media (max-width: 480px) {
-            .notice-inner { padding: 10px 12px; gap: 10px; }
-            .notice-title { font-size: 12px; }
-            .notice-text { font-size: 11px; }
-            .notice-icon { font-size: 17px; }
-        }
+    function closeModal() {
+        document.getElementById('anime-modal').classList.remove('open');
+        document.getElementById('main-iframe').src = '';
+        document.getElementById('modal-player').classList.remove('active');
+        document.body.style.overflow = '';
+    }
 
-        .shimmer-bg {
-            background: linear-gradient(90deg, transparent 0%, rgba(230,57,70,0.06) 50%, transparent 100%);
-            background-size: 200% 100%; animation: shimmer 2.5s infinite;
-        }
-        .text-gradient {
-            background: linear-gradient(135deg, #e63946, #ff6b6b, #e63946);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-        .gold-gradient {
-            background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-        [data-theme="light"] .gold-gradient {
-            background: linear-gradient(135deg, #c4900a, #a07000, #c4900a);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
+    init();
+</script>
 
-        /* ===== LOADING SCREEN ===== */
-        #loading-screen {
-            position: fixed; inset: 0; z-index: 9999; background: var(--bg-primary);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.6s ease;
-        }
-        #loading-screen.hidden { opacity: 0; pointer-events: none; }
-        #loading-screen .logo-wrap { position: relative; animation: scaleIn 0.6s ease-out; }
-        #loading-screen .logo-glow {
-            position: absolute; inset: -32px; background: rgba(230,57,70,0.1);
-            border-radius: 50%; filter: blur(30px); animation: pulse-glow 2s infinite;
-        }
-        #loading-screen .logo-text {
-            position: relative; font-family: 'Outfit', sans-serif;
-            font-size: 48px; font-weight: 900; letter-spacing: 4px;
-        }
-        #loading-screen .loading-bar-track {
-            margin-top: 32px; width: 192px; height: 4px;
-            background: var(--bg-card); border-radius: 4px; overflow: hidden;
-        }
-        #loading-screen .loading-bar-fill {
-            height: 100%; width: 50%;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-            border-radius: 4px; animation: loadingBar 1s ease-in-out infinite;
-        }
-        #loading-screen .loading-text {
-            margin-top: 16px; color: var(--text-muted); font-size: 14px;
-            animation: fadeIn 0.5s ease 0.7s both;
-        }
-        @media (max-width: 480px) {
-            #loading-screen .logo-text { font-size: 36px; letter-spacing: 2px; }
-            #loading-screen .loading-bar-track { width: 140px; }
-        }
-
-        /* ===== NAVBAR ===== */
-        #navbar {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-            transition: all 0.4s ease; background: transparent;
-        }
-        #navbar.scrolled {
-            background: rgba(5,5,8,0.92); backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-        }
-        [data-theme="light"] #navbar.scrolled { background: rgba(245,245,247,0.92); }
-        .nav-inner {
-            max-width: 1280px; margin: 0 auto; padding: 0 16px;
-            display: flex; align-items: center; justify-content: space-between;
-            height: 72px; overflow: hidden;
-        }
-        .nav-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; transition: transform 0.2s; flex-shrink: 0; }
-        .nav-logo:hover { transform: scale(1.03); }
-        .nav-logo-icon {
-            width: 44px; height: 44px; background: var(--accent); border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 18px;
-            color: white; letter-spacing: 1px; flex-shrink: 0;
-        }
-        .nav-logo-text h1 { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 2px; }
-        .nav-logo-text p { font-size: 10px; color: var(--text-muted); letter-spacing: 3px; margin-top: 2px; }
-        .nav-search { flex: 1; max-width: 420px; margin: 0 16px; position: relative; min-width: 0; }
-        .nav-search input {
-            width: 100%; background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 14px; padding: 10px 42px 10px 16px;
-            color: var(--text-primary); font-family: inherit; font-size: 14px;
-            outline: none; transition: border-color 0.3s;
-        }
-        .nav-search input::placeholder { color: var(--text-muted); }
-        .nav-search input:focus { border-color: rgba(230,57,70,0.5); }
-        .nav-search .search-icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
-        .nav-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .theme-toggle-btn {
-            display: flex; align-items: center; justify-content: center;
-            width: 38px; height: 38px; background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 12px; cursor: pointer; font-size: 16px;
-            transition: all 0.3s; color: var(--text-secondary); flex-shrink: 0;
-        }
-        .theme-toggle-btn:hover { border-color: rgba(230,57,70,0.4); background: var(--bg-card-hover); }
-        .telegram-btn {
-            display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
-            background: rgba(0,136,204,0.1); border: 1px solid rgba(0,136,204,0.3);
-            border-radius: 14px; color: var(--telegram); font-size: 14px; font-weight: 500;
-            text-decoration: none; transition: all 0.3s; font-family: inherit; white-space: nowrap;
-        }
-        .telegram-btn:hover { background: rgba(0,136,204,0.2); transform: scale(1.03); }
-        .mobile-search-btn {
-            display: none; padding: 8px; background: var(--bg-card);
-            border: 1px solid var(--border); border-radius: 10px;
-            color: var(--text-secondary); cursor: pointer; font-size: 18px;
-            align-items: center; justify-content: center;
-        }
-        @media (max-width: 768px) {
-            .nav-search { display: none; }
-            .telegram-btn span { display: none; }
-            .telegram-btn { padding: 8px 12px; }
-            .mobile-search-btn { display: flex; }
-            .nav-inner { height: 60px; }
-        }
-        @media (max-width: 480px) {
-            .nav-logo-text { display: none; }
-            .nav-logo-icon { width: 38px; height: 38px; font-size: 15px; }
-        }
-        #mobile-search-bar { display: none; padding: 0 16px 12px; background: rgba(5,5,8,0.95); }
-        [data-theme="light"] #mobile-search-bar { background: rgba(245,245,247,0.95); }
-        #mobile-search-bar.show { display: block; }
-        #mobile-search-bar input {
-            width: 100%; background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 14px; padding: 12px 16px;
-            color: var(--text-primary); font-family: inherit; font-size: 14px;
-            outline: none; transition: border-color 0.3s;
-        }
-        #mobile-search-bar input::placeholder { color: var(--text-muted); }
-        #mobile-search-bar input:focus { border-color: rgba(230,57,70,0.5); }
-
-        /* ===== HERO SECTION ===== */
-        #hero { position: relative; min-height: 90vh; display: flex; align-items: center; overflow: hidden; padding-top: 80px; }
-        .hero-bg { position: absolute; inset: 0; }
-        .hero-bg .overlay-1 { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-primary), rgba(5,5,8,0.8), rgba(5,5,8,0.4)); }
-        [data-theme="light"] .hero-bg .overlay-1 { background: linear-gradient(to top, var(--bg-primary), rgba(245,245,247,0.85), rgba(245,245,247,0.5)); }
-        .hero-bg .overlay-2 { position: absolute; inset: 0; background: linear-gradient(to right, var(--bg-primary), transparent, var(--bg-primary)); }
-        [data-theme="light"] .hero-bg .overlay-2 { background: linear-gradient(to right, var(--bg-primary), transparent, var(--bg-primary)); }
-        .hero-orb-1 { position: absolute; top: 80px; right: 40px; width: 300px; height: 300px; background: rgba(230,57,70,0.05); border-radius: 50%; filter: blur(100px); pointer-events: none; }
-        .hero-orb-2 { position: absolute; bottom: 80px; left: 40px; width: 400px; height: 400px; background: rgba(230,57,70,0.03); border-radius: 50%; filter: blur(120px); pointer-events: none; }
-        .hero-content { position: relative; z-index: 10; max-width: 1280px; margin: 0 auto; padding: 0 16px; width: 100%; }
-        .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
-        .hero-badge {
-            display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px;
-            background: rgba(230,57,70,0.1); border: 1px solid rgba(230,57,70,0.2);
-            border-radius: 50px; margin-bottom: 24px; font-size: 12px; color: var(--accent);
-            font-weight: 500; animation: fadeInUp 0.8s ease 0.2s both;
-        }
-        .hero-title { font-size: clamp(28px, 6vw, 72px); font-weight: 900; line-height: 1.15; margin-bottom: 24px; animation: fadeInUp 0.8s ease 0.3s both; }
-        .hero-desc { color: var(--text-secondary); font-size: 16px; line-height: 1.8; max-width: 520px; margin-bottom: 32px; animation: fadeInUp 0.8s ease 0.5s both; }
-        .hero-buttons { display: flex; flex-wrap: wrap; gap: 12px; animation: fadeInUp 0.8s ease 0.7s both; }
-        .btn-primary {
-            display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px;
-            background: var(--accent); border: none; border-radius: 16px; color: white;
-            font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
-            transition: all 0.3s; box-shadow: 0 8px 24px rgba(230,57,70,0.25); white-space: nowrap;
-        }
-        .btn-primary:hover { background: var(--accent-dark); box-shadow: 0 8px 32px rgba(230,57,70,0.4); }
-        .btn-secondary {
-            display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px;
-            background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
-            color: var(--text-secondary); font-family: inherit; font-size: 15px;
-            font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s; white-space: nowrap;
-        }
-        .btn-secondary:hover { border-color: rgba(230,57,70,0.3); color: var(--text-primary); }
-        .hero-stats {
-            display: flex; flex-wrap: wrap; gap: 24px; margin-top: 40px; padding-top: 32px;
-            border-top: 1px solid rgba(30,30,46,0.5); animation: fadeInUp 0.8s ease 1s both;
-        }
-        [data-theme="light"] .hero-stats { border-top-color: var(--border); }
-        .hero-stat-value { font-size: 24px; font-weight: 900; }
-        .hero-stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-        .hero-featured { animation: slideInRight 0.8s ease 0.5s both; }
-        .hero-featured-inner { position: relative; animation: float 6s ease-in-out infinite; }
-        .hero-featured-glow { position: absolute; inset: -16px; background: linear-gradient(135deg, rgba(230,57,70,0.15), transparent, rgba(230,57,70,0.08)); border-radius: 24px; filter: blur(20px); }
-        .hero-featured-card { position: relative; background: rgba(18,18,26,0.8); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
-        .hero-featured-card img { width: 100%; height: 450px; object-fit: cover; }
-        .hero-featured-card .card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-card), transparent, transparent); }
-        .hero-featured-info { position: absolute; bottom: 0; right: 0; left: 0; padding: 24px; }
-        .hero-featured-score { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; color: var(--gold); font-weight: 700; font-size: 14px; }
-        .hero-featured-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-        .hero-featured-sub { font-size: 13px; color: var(--text-muted); }
-        @media (max-width: 1024px) { .hero-grid { grid-template-columns: 1fr; } .hero-featured { display: none !important; } #hero { min-height: 70vh; } }
-        @media (max-width: 768px) { #hero { min-height: auto; padding-top: 80px; padding-bottom: 40px; } .hero-desc { font-size: 14
+</body>
+    </html>
+    
