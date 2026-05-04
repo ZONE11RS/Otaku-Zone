@@ -3,383 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Otaku Zone - عالم الأنمي العربي</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0a10'/%3E%3Ctext x='50' y='40' font-family='Arial Black' font-size='28' font-weight='900' fill='%23e63946' text-anchor='middle' dominant-baseline='middle'%3EOZ%3C/text%3E%3Ctext x='50' y='72' font-family='Arial' font-size='12' fill='%23888' text-anchor='middle'%3Eアニメ%3C/text%3E%3C/svg%3E">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Otaku Zone - تصحيح روابط الحلقات</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* ===== THEME VARIABLES ===== */
-        :root {
-            --bg-primary: #050508;
-            --bg-secondary: #0c0c12;
-            --bg-card: #12121a;
-            --bg-card-hover: #1a1a25;
-            --bg-modal: #0a0a10;
-            --accent: #e63946;
-            --accent-glow: #ff1a2e;
-            --accent-dark: #b91c28;
-            --gold: #ffd700;
-            --gold-dim: #c4a000;
-            --text-primary: #f0f0f5;
-            --text-secondary: #8888a0;
-            --text-muted: #55556a;
-            --border: #1e1e2e;
-            --border-accent: #2a2a3e;
-            --telegram: #0088cc;
-        }
+        :root { --bg: #050508; --card: #12121a; --accent: #e63946; --text: #f0f0f5; --border: #1e1e2e; }
+        body { background: var(--bg); color: var(--text); font-family: 'Noto Kufi Arabic', sans-serif; margin: 0; direction: rtl; }
+        
+        /* Grid */
+        .container { max-width: 1200px; margin: 80px auto; padding: 20px; }
+        .anime-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+        .card { background: var(--card); border-radius: 12px; cursor: pointer; border: 1px solid var(--border); overflow: hidden; }
+        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .card-title { padding: 10px; font-size: 13px; text-align: center; }
 
-        [data-theme="light"] {
-            --bg-primary: #f5f5f7;
-            --bg-secondary: #ebebef;
-            --bg-card: #ffffff;
-            --bg-card-hover: #f0f0f5;
-            --bg-modal: #ffffff;
-            --accent: #e63946;
-            --accent-glow: #ff1a2e;
-            --accent-dark: #b91c28;
-            --gold: #c4900a;
-            --gold-dim: #a07000;
-            --text-primary: #111118;
-            --text-secondary: #55556a;
-            --text-muted: #9090a8;
-            --border: #dcdce8;
-            --border-accent: #c8c8da;
-            --telegram: #006fa8;
-        }
+        /* Modal */
+        #modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; z-index: 1000; overflow-y: auto; padding: 20px; }
+        #modal.open { display: block; }
+        .modal-content { max-width: 900px; margin: 0 auto; background: var(--bg); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; }
+        
+        /* Player */
+        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; display: none; }
+        .video-box.active { display: block; }
+        iframe { width: 100%; height: 100%; border: none; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: 'Noto Kufi Arabic', sans-serif;
-            direction: rtl;
-            overflow-x: hidden;
-            min-height: 100vh;
-            width: 100%;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
+        .details { padding: 20px; }
+        .season-nav { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; }
+        .pill { padding: 8px 20px; background: var(--card); border: 1px solid var(--border); border-radius: 30px; cursor: pointer; white-space: nowrap; }
+        .pill.active { background: var(--accent); border-color: var(--accent); }
 
-        /* ===== ANIMATIONS ===== */
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(230, 57, 70, 0.1); } 50% { box-shadow: 0 0 40px rgba(230, 57, 70, 0.25); } }
-        @keyframes loadingBar { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-        @keyframes scaleIn { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes slideDown { from { transform: translateY(-110%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(0); opacity: 1; max-height: 200px; } to { transform: translateY(-110%); opacity: 0; max-height: 0; } }
-
-        /* ===== NOTICE BANNER ===== */
-        #apology-notice { position: fixed; top: 0; left: 0; right: 0; z-index: 9998; transform: translateY(-110%); opacity: 0; will-change: transform, opacity; }
-        #apology-notice.slide-in { animation: slideDown 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        #apology-notice.slide-out { animation: slideUp 0.4s ease-in forwards; }
-        .notice-inner { background: linear-gradient(135deg, #1a0d0e 0%, #120a0b 50%, #1a0d0e 100%); border-bottom: 1px solid rgba(230, 57, 70, 0.35); padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6); position: relative; overflow: hidden; }
-        .notice-title { font-size: 13px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
-        .notice-text { font-size: 12px; color: var(--text-secondary); line-height: 1.75; }
-        .notice-close { flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px; background: rgba(230, 57, 70, 0.1); border: 1px solid rgba(230, 57, 70, 0.2); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-        /* ===== LOADING SCREEN ===== */
-        #loading-screen { position: fixed; inset: 0; z-index: 9999; background: var(--bg-primary); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.6s ease; }
-        #loading-screen.hidden { opacity: 0; pointer-events: none; }
-        .loading-bar-track { margin-top: 32px; width: 192px; height: 4px; background: var(--bg-card); border-radius: 4px; overflow: hidden; }
-        .loading-bar-fill { height: 100%; width: 50%; background: linear-gradient(90deg, transparent, var(--accent), transparent); animation: loadingBar 1s ease-in-out infinite; }
-
-        /* ===== NAVBAR ===== */
-        #navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; transition: all 0.4s ease; background: transparent; }
-        #navbar.scrolled { background: rgba(5,5,8,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
-        .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; height: 72px; }
-        .nav-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .nav-logo-icon { width: 44px; height: 44px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; }
-        .nav-search { flex: 1; max-width: 420px; margin: 0 16px; position: relative; }
-        .nav-search input { width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 10px 42px 10px 16px; color: var(--text-primary); outline: none; }
-        .theme-toggle-btn { width: 38px; height: 38px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; color: var(--text-secondary); }
-
-        /* ===== HERO ===== */
-        #hero { position: relative; min-height: 80vh; display: flex; align-items: center; padding-top: 80px; }
-        .hero-content { position: relative; z-index: 10; max-width: 1280px; margin: 0 auto; padding: 0 16px; width: 100%; }
-        .hero-title { font-size: clamp(28px, 6vw, 60px); font-weight: 900; margin-bottom: 24px; }
-        .btn-primary { padding: 14px 28px; background: var(--accent); border: none; border-radius: 16px; color: white; font-weight: 700; cursor: pointer; box-shadow: 0 8px 24px rgba(230,57,70,0.25); }
-
-        /* ===== ANIME GRID ===== */
-        #anime-section { padding: 40px 16px 64px; }
-        .anime-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
-        .anime-card { cursor: pointer; transition: transform 0.3s ease; }
-        .anime-card:hover { transform: translateY(-6px); }
-        .anime-card-inner { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
-        .anime-card-img { position: relative; aspect-ratio: 3/4; }
-        .anime-card-img img { width: 100%; height: 100%; object-fit: cover; }
-        .anime-card-info { padding: 12px; }
-
-        /* ===== MODAL ===== */
-        #anime-modal { position: fixed; inset: 0; z-index: 200; display: none; align-items: flex-start; justify-content: center; overflow-y: auto; background: rgba(0,0,0,0.95); backdrop-filter: blur(4px); padding: 20px 10px; }
-        #anime-modal.open { display: flex; }
-        .modal-card { position: relative; width: 100%; max-width: 1100px; background: var(--bg-modal); border: 1px solid var(--border); border-radius: 24px; overflow: hidden; animation: fadeInUp 0.4s ease; }
-        .modal-close { position: absolute; top: 12px; left: 12px; z-index: 20; width: 36px; height: 36px; background: rgba(18,18,26,0.9); border: 1px solid var(--border); border-radius: 12px; color: white; cursor: pointer; }
-        .modal-player { display: none; width: 100%; background: #000; }
-        .modal-player.active { display: block; }
-        .modal-player-wrap { position: relative; padding-bottom: 56.25%; }
-        .modal-player-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
-        .modal-body { padding: 24px; }
-        .modal-layout { display: flex; flex-direction: column; gap: 28px; }
-        @media (min-width: 768px) { .modal-layout { flex-direction: row; } }
-
-        /* ===== SEASON & EPISODES ===== */
-        .season-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
-        .season-pill { padding: 8px 16px; border-radius: 50px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-secondary); cursor: pointer; }
-        .season-pill.active { background: var(--accent); color: white; border-color: var(--accent); }
-        .episodes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px; margin-top: 15px; }
-        .episode-btn { padding: 10px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-secondary); font-weight: 700; cursor: pointer; transition: all 0.2s; }
-        .episode-btn.active { background: var(--accent); color: white; border-color: var(--accent); transform: scale(1.05); }
-
-        .modal-tab-btn { padding: 10px 20px; border: none; background: none; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
-        .modal-tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-        .tab-panel { display: none; padding-top: 20px; }
-        .tab-panel.active { display: block; }
-
-        footer { border-top: 1px solid var(--border); padding: 40px 16px; text-align: center; color: var(--text-muted); }
+        .ep-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; }
+        .ep-btn { padding: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: #fff; cursor: pointer; transition: 0.2s; }
+        .ep-btn:hover { border-color: var(--accent); }
+        .ep-btn.active { background: var(--accent); }
+        
+        .close-btn { position: absolute; top: 30px; left: 30px; background: var(--accent); color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; z-index: 1100; }
     </style>
 </head>
 <body>
 
-<div id="apology-notice">
-    <div class="notice-inner">
-        <div class="notice-content">
-            <div class="notice-title">تنويه واعتذار:</div>
-            <div class="notice-text">نعتذر عن أي إعلانات غير لائقة خارجة عن إرادتنا، نحن نعمل على تصفيتها.</div>
-        </div>
-        <button class="notice-close" onclick="closeApologyNotice()">✕</button>
-    </div>
+<button class="close-btn" id="closeBtn" style="display:none;" onclick="closeModal()">✕</button>
+
+<div class="container">
+    <div class="anime-grid" id="mainGrid"></div>
 </div>
 
-<div id="loading-screen">
-    <h1 style="font-weight:900; letter-spacing:2px;">OTAKU <span style="color:var(--accent)">ZONE</span></h1>
-    <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
-</div>
-
-<nav id="navbar">
-    <div class="nav-inner">
-        <div class="nav-logo">
-            <div class="nav-logo-icon">OZ</div>
-            <h2 style="font-size: 18px; margin-right:10px;">OTAKU ZONE</h2>
+<div id="modal">
+    <div class="modal-content">
+        <div class="video-box" id="videoBox">
+            <iframe id="player" src="" allowfullscreen></iframe>
         </div>
-        <div class="nav-search">
-            <input type="text" id="desktop-search" placeholder="ابحث عن أنمي..." oninput="filterAnime(this.value)">
-        </div>
-        <div class="nav-actions">
-            <button class="theme-toggle-btn" onclick="toggleTheme()">🌙</button>
-        </div>
-    </div>
-</nav>
-
-<section id="hero">
-    <div class="hero-content">
-        <h1 class="hero-title">عالم <span style="color:var(--accent)">الأنمي</span> بين يديك</h1>
-        <button class="btn-primary" onclick="document.getElementById('anime-section').scrollIntoView()">ابدأ المشاهدة</button>
-    </div>
-</section>
-
-<section id="anime-section">
-    <div class="anime-grid" id="anime-grid-container"></div>
-</section>
-
-<div id="anime-modal" onclick="if(event.target===this)closeModal()">
-    <div class="modal-card">
-        <button class="modal-close" onclick="closeModal()">✕</button>
-        
-        <div class="modal-player" id="modal-player">
-            <div class="modal-player-wrap">
-                <iframe id="player-iframe" src="" allowfullscreen></iframe>
-            </div>
-        </div>
-
-        <div class="modal-body">
-            <div class="modal-layout">
-                <div style="flex: 0 0 240px;">
-                    <img id="modal-poster" src="" style="width:100%; border-radius:15px; border:1px solid var(--border);">
-                    <div id="season-pills-wrap">
-                        <p style="margin-top:15px; font-size:13px; color:var(--text-muted);">اختر الموسم:</p>
-                        <div class="season-pills" id="season-pills"></div>
-                    </div>
-                </div>
-                <div style="flex:1;">
-                    <h1 id="modal-title" style="margin-bottom:10px;"></h1>
-                    <div class="modal-tabs">
-                        <button class="modal-tab-btn active" onclick="switchTab(event,'tab-story')">الحلقات والقصة</button>
-                        <button class="modal-tab-btn" onclick="switchTab(event,'tab-info')">معلومات</button>
-                    </div>
-                    <div id="tab-story" class="tab-panel active">
-                        <div id="episodes-display"></div>
-                    </div>
-                    <div id="tab-info" class="tab-panel">
-                        <p id="modal-desc" style="line-height:1.8; color:var(--text-secondary);"></p>
-                    </div>
-                </div>
-            </div>
+        <div class="details">
+            <h2 id="mTitle"></h2>
+            <div class="season-nav" id="mSeasons"></div>
+            <div class="ep-grid" id="mEpisodes"></div>
         </div>
     </div>
 </div>
-
-<footer>
-    <p>© 2026 Otaku Zone - جميع الحقوق محفوظة</p>
-</footer>
 
 <script>
 const SB_URL = "https://bdzbajkpaqkujbkvrjfu.supabase.co";
 const SB_KEY = "sb_publishable_gwkBiDaTv8jYG4IHFITCLA__zBnhS8r";
 const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-let allAnimeData = {};
-let currentSeasonsMap = {};
-let currentModalEpisodes = [];
+let store = {}; // تخزين كل البيانات هنا
+let currentSeasons = {};
 
-// ===========================
-// المشكلة الأساسية: معالجة الحلقات والتشغيل المباشر
-// ===========================
+async function start() {
+    // 1. جلب كل الحلقات من Supabase
+    const { data: allEpisodes, error } = await _supabase.from('episodes').select('*');
+    if (error) return console.error("Error fetching episodes:", error);
 
-function selectSeasonPill(btn, seasonNum) {
-    document.querySelectorAll('#season-pills .season-pill').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    updateEpisodes(seasonNum);
-}
+    // 2. تجميع الحلقات حسب الأنمي
+    const grouped = allEpisodes.reduce((acc, ep) => {
+        if (!acc[ep.mal_id]) acc[ep.mal_id] = [];
+        acc[ep.mal_id].push(ep);
+        return acc;
+    }, {});
 
-function updateEpisodes(seasonNum) {
-    const eps = (currentSeasonsMap[seasonNum] || []).sort((a, b) => a.episode_number - b.episode_number);
-    const display = document.getElementById('episodes-display');
-    
-    if (!eps.length) {
-        display.innerHTML = '<p>لا توجد حلقات.</p>';
-        return;
+    // 3. جلب معلومات الأنمي من Jikan وتعبئة الشبكة
+    for (const id in grouped) {
+        try {
+            const res = await fetch(`https://api.jikan.moe/v4/anime/${id}`);
+            const { data: info } = await res.json();
+            
+            store[id] = { info, episodes: grouped[id] };
+
+            document.getElementById('mainGrid').innerHTML += `
+                <div class="card" onclick="openModal('${id}')">
+                    <img src="${info.images.jpg.image_url}">
+                    <div class="card-title">${info.title}</div>
+                </div>
+            `;
+            await new Promise(r => setTimeout(r, 400)); // احترام حدود الـ API
+        } catch (e) { console.error(e); }
     }
-
-    display.innerHTML = `<div class="episodes-grid">${eps.map(e => `
-        <button class="episode-btn" id="ep-btn-${e.episode_number}" 
-                onclick="playEpisode('${e.video_url}', ${e.episode_number})">
-            الحلقة ${e.episode_number}
-        </button>
-    `).join('')}</div>`;
 }
 
-function playEpisode(url, epNum) {
-    // 1. تفعيل الزر بصرياً
-    document.querySelectorAll('.episode-btn').forEach(b => b.classList.remove('active'));
-    const btn = document.getElementById(`ep-btn-${epNum}`);
-    if (btn) btn.classList.add('active');
-
-    // 2. تحديث المشغل وتشغيله
-    const player = document.getElementById('modal-player');
-    const iframe = document.getElementById('player-iframe');
+function openModal(id) {
+    const data = store[id];
+    document.getElementById('mTitle').textContent = data.info.title;
+    document.getElementById('player').src = "";
+    document.getElementById('videoBox').classList.remove('active');
     
-    player.classList.add('active'); // إظهار حاوية الفيديو
-    iframe.src = url; // وضع الرابط المباشر
+    // تقسيم الحلقات لمواسم
+    currentSeasons = data.episodes.reduce((acc, ep) => {
+        if (!acc[ep.season_number]) acc[ep.season_number] = [];
+        acc[ep.season_number].push(ep);
+        return acc;
+    }, {});
 
-    // 3. التمرير للأعلى لرؤية الفيديو بوضوح
-    document.getElementById('anime-modal').scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// ===========================
-// وظائف المودال والبيانات
-// ===========================
-
-async function openModal(malId) {
-    const data = allAnimeData[malId];
-    if (!data) return;
-
-    const modal = document.getElementById('anime-modal');
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
-
-    document.getElementById('modal-title').textContent = data.anime.title;
-    document.getElementById('modal-poster').src = data.anime.images.jpg.large_image_url;
-    document.getElementById('modal-desc').textContent = data.anime.synopsis;
-    
-    // إعادة تعيين المشغل
-    document.getElementById('modal-player').classList.remove('active');
-    document.getElementById('player-iframe').src = '';
-
-    // تنظيم الفصول/المواسم
-    currentSeasonsMap = {};
-    data.episodes.forEach(e => {
-        if (!currentSeasonsMap[e.season_number]) currentSeasonsMap[e.season_number] = [];
-        currentSeasonsMap[e.season_number].push(e);
-    });
-
-    const seasons = Object.keys(currentSeasonsMap).sort((a,b)=>a-b);
-    const pillsContainer = document.getElementById('season-pills');
-    
-    pillsContainer.innerHTML = seasons.map((s, i) => `
-        <button class="season-pill ${i===0?'active':''}" onclick="selectSeasonPill(this, ${s})">موسم ${s}</button>
+    const sNums = Object.keys(currentSeasons).sort((a,b) => a-b);
+    const sContainer = document.getElementById('mSeasons');
+    sContainer.innerHTML = sNums.map((n, i) => `
+        <div class="pill ${i===0?'active':''}" onclick="renderEpisodes(this, ${n})">الموسم ${n}</div>
     `).join('');
 
-    updateEpisodes(seasons[0]);
+    renderEpisodes(null, sNums[0]);
+    
+    document.getElementById('modal').classList.add('open');
+    document.getElementById('closeBtn').style.display = "block";
+    document.body.style.overflow = "hidden";
+}
+
+// الدالة المسؤولة عن جلب روابط الحلقات الصحيحة
+function renderEpisodes(btn, sNum) {
+    if (btn) {
+        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    // ترتيب الحلقات تصاعدياً
+    const eps = currentSeasons[sNum].sort((a, b) => a.episode_number - b.episode_number);
+    const container = document.getElementById('mEpisodes');
+
+    // هنا تكمن القوة: نمرر الرابط المباشر `video_url` القادم من Supabase لكل زر
+    container.innerHTML = eps.map(e => `
+        <button class="ep-btn" id="btn-ep-${e.episode_number}" 
+                onclick="watch('${e.video_url}', ${e.episode_number})">
+            ${e.episode_number}
+        </button>
+    `).join('');
+}
+
+function watch(link, num) {
+    const box = document.getElementById('videoBox');
+    const player = document.getElementById('player');
+
+    // 1. تفعيل المشغل ووضع الرابط
+    box.classList.add('active');
+    player.src = link;
+
+    // 2. تلوين الزر المختار
+    document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`btn-ep-${num}`).classList.add('active');
+
+    // 3. رفع الشاشة للمشغل
+    document.getElementById('modal').scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function closeModal() {
-    document.getElementById('anime-modal').classList.remove('open');
-    document.body.style.overflow = '';
-    document.getElementById('player-iframe').src = '';
+    document.getElementById('modal').classList.remove('open');
+    document.getElementById('closeBtn').style.display = "none";
+    document.getElementById('player').src = "";
+    document.body.style.overflow = "auto";
 }
 
-function switchTab(e, tabId) {
-    document.querySelectorAll('.modal-tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    e.target.classList.add('active');
-    document.getElementById(tabId).classList.add('active');
-}
-
-// ===========================
-// تهيئة البيانات (Supabase + Jikan)
-// ===========================
-
-async function init() {
-    const { data: episodes } = await _supabase.from('episodes').select('*');
-    const groups = {};
-    episodes.forEach(e => {
-        if(!groups[e.mal_id]) groups[e.mal_id] = [];
-        groups[e.mal_id].push(e);
-    });
-
-    const container = document.getElementById('anime-grid-container');
-    const ids = Object.keys(groups);
-
-    for (const id of ids) {
-        const res = await fetch(`https://api.jikan.moe/v4/anime/${id}`);
-        const { data: anime } = await res.json();
-        allAnimeData[id] = { anime, episodes: groups[id] };
-        
-        container.innerHTML += `
-            <div class="anime-card" onclick="openModal(${id})">
-                <div class="anime-card-inner">
-                    <div class="anime-card-img"><img src="${anime.images.jpg.image_url}"></div>
-                    <div class="anime-card-info">
-                        <p style="font-size:12px; font-weight:bold; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${anime.title}</p>
-                    </div>
-                </div>
-            </div>
-        `;
-        await new Promise(r => setTimeout(r, 400)); // لعدم حظر الـ API
-    }
-    document.getElementById('loading-screen').classList.add('hidden');
-}
-
-function toggleTheme() {
-    const theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', theme);
-}
-
-function closeApologyNotice() {
-    document.getElementById('apology-notice').classList.add('slide-out');
-}
-
-window.addEventListener('scroll', () => {
-    if(window.scrollY > 50) document.getElementById('navbar').classList.add('scrolled');
-    else document.getElementById('navbar').classList.remove('scrolled');
-});
-
-init();
+start();
 </script>
 </body>
 </html>
